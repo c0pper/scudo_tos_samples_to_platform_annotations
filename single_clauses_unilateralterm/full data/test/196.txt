@@ -1,1 +1,0 @@
-WeTransfer may suspend or cancel the Services to you if a payment is not successfully settled, for instance in case of insufficient funds, expiration of credit cards, changed payment details or otherwise.

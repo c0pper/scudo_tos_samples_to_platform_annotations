@@ -1,71 +1,52 @@
-from openpyxl import load_workbook, Workbook
-from openpyxl.utils import get_column_letter
+import json
+from corpus_functions import create_annotated_file, create_folder_structure, normalize_fucked_encoding
+from tqdm import tqdm
 
-category = "Unilateral termination"
+class Clause():
+    def __init__(self, serv_prov: str, grade: str, text: str, tags=None):
+        self.serv_prov = serv_prov
+        self.grade = grade
+        self.text = text
+        self.tags = tags
 
-wb_name = "unilateral_term"
-wb = load_workbook(f'{wb_name}.xlsx')
+    def collect_tags(self, clause: dict, number_of_tags: int, tag_key: str = "tag"):
+        if tag_key in clause.keys():
+            self.tags.append(clause[f"{tag_key}"])
+            for tag_num in range(2, number_of_tags + 1):
+                if f"{tag_key}{tag_num}" in clause.keys():
+                    self.tags.append(clause[f"{tag_key}{tag_num}"])
 
-ws = wb.active
-clause_col = ws['C']
+        elif "explanation" in clause.keys():
+            tags = clause["explanation"].split(", ")
+            for t in tags:
+                if not bool(t):
+                    tags.remove(t)
+            stripped_tags = list(map(str.rstrip, tags))
+            lowered_tags = list(map(str.lower, stripped_tags))
+            self.tags = lowered_tags
 
-def create_clauses_dict():
-    clauses = []
-    print(get_column_letter(1))
+        self.tags.insert(0, self.grade)
 
-    for cell in clause_col:
-        reasons = []
-        reason_startingcol = 4
-        while ws[f'{get_column_letter(reason_startingcol)}{cell.row}'].value:
-            reason_cell = f'{get_column_letter(reason_startingcol)}{cell.row}'
-            reasons.append(ws[reason_cell].value)
-            reason_startingcol += 1
+    def __str__(self):
+        return f"Service: {self.serv_prov} \nGrade: {self.grade} \nText: {self.text} \nTags: {self.tags}"
 
-        if ws[f'B{cell.row}'].value[-1] == "2":
-            grade = "Potentially Unfair"
-            cat_grade_reason = {"cat": category, "grade": grade, "reasons": reasons, "text": cell.value}
-            clauses.append(cat_grade_reason)
-        elif ws[f'B{cell.row}'].value[-1] == "3":
-            grade = "Unfair"
-            cat_grade_reason = {"cat": category, "grade": grade, "reasons": reasons, "text": cell.value}
-            clauses.append(cat_grade_reason)
-        else:
-            grade = "Fair"
-            cat_grade_reason = {"cat": category, "grade": grade, "reasons": reasons, "text": cell.value}
-            clauses.append(cat_grade_reason)
-    
-    return clauses
 
-clauses = create_clauses_dict()
-new = Workbook()
-ws = new.active
+if __name__ == "__main__":
+    ds = json.load(open("balanced_dataset_fcasciola.json", encoding="UTF8"))
+    categories = ["A", "J", "LAW", "PINC", "USE", "LTD", "CH", "CR", "TER"]
+    root_path = r"C:\Users\smarotta\Desktop\scudo_ann"
+    folders = create_folder_structure(root_path)
 
-r = 1
-id_count = 0
-for clause in clauses:
-    # print(len(clause["reasons"]), clause["reasons"], clause["text"])
+    for cat in categories:
+        for idx, clause in tqdm(enumerate(ds[cat])):
+            clause_obj = Clause(clause["serv_prov"], clause["grade"], normalize_fucked_encoding(clause["clause"]), tags=[])
+            clause_obj.collect_tags(clause=clause, number_of_tags=5, tag_key="tag")
 
-    n_reasons = len(clause["reasons"])
+            print(f"{clause_obj}\n")
+            create_annotated_file(
+                folders=folders,
+                filename=f"{clause_obj.grade}_{idx+2}",
+                text=clause_obj.text,
+                annotations=clause_obj.tags
+            )
 
-    # template id
-    ws.cell(row=r, column=1).value = id_count
-    ws.cell(row=r+1, column=1).value = id_count
-    for n in range(n_reasons):
-        ws.cell(row=r+2+n, column=1).value = id_count
-
-    # fields
-    ws.cell(row=r, column=2).value = "category"
-    ws.cell(row=r+1, column=2).value = "grade"
-    for n in range(n_reasons):
-        ws.cell(row=r+2+n, column=2).value = "reason"
-
-    #cpk values
-    ws.cell(row=r, column=3).value = clause["cat"]
-    ws.cell(row=r+1, column=3).value = clause["grade"]
-    for n in range(n_reasons):
-        ws.cell(row=r+2+n, column=3).value = clause["reasons"][n]
-
-    r += 2+n_reasons
-    id_count += 1
-
-new.save(f'{wb_name}_targets.xlsx')
