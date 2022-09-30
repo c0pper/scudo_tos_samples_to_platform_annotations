@@ -3,6 +3,16 @@ import os
 import zipfile
 
 
+class AnnotationJob():
+    def __init__(self, root_path: str):
+        self.root_path = root_path
+
+class CategorizationJob(AnnotationJob):
+    def __init__(self, root_path: str, taxonomy: list = None):
+        super().__init__(root_path)
+        if not taxonomy:
+            self.taxonomy = []
+
 def create_annotated_file(folders: dict, filename: str, text: str, annotations: list):
     """
 
@@ -18,11 +28,13 @@ def create_annotated_file(folders: dict, filename: str, text: str, annotations: 
     with open(f"{folders['tax_test_folder']}/{filename}.txt", 'w', encoding="utf-8") as file:
         # print(txt)
         file.write(text)
+    file.close()
 
     with open(f"{folders['tax_ann_folder']}/{filename}.ann", 'a', encoding="utf-8") as ann:
         for a in annotations:
             ann.write(f"C{tax_count}		{a}\n")
             tax_count += 1
+    ann.close()
 
     create_zip(
         tax_folder=folders["tax_folder"],
