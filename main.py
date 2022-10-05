@@ -1,5 +1,5 @@
 import json
-from corpus_functions import create_annotated_file, create_folder_structure, normalize_fucked_encoding
+from corpus_functions import create_annotated_libraries, create_folder_structure, normalize_fucked_encoding
 from tqdm import tqdm
 
 class Clause():
@@ -43,7 +43,7 @@ if __name__ == "__main__":
             clause_obj.collect_tags(clause=clause, number_of_tags=5, tag_key="tag")
 
             # print(f"{clause_obj}\n")
-            create_annotated_file(
+            create_annotated_libraries(
                 folders=folders,
                 filename=f"{clause_obj.grade}_{idx+2}",
                 text=clause_obj.text,

@@ -7,19 +7,22 @@ class AnnotationJob():
     def __init__(self, root_path: str):
         self.root_path = root_path
 
+
 class CategorizationJob(AnnotationJob):
     def __init__(self, root_path: str, taxonomy: list = None):
         super().__init__(root_path)
         if not taxonomy:
             self.taxonomy = []
 
-def create_annotated_file(folders: dict, filename: str, text: str, annotations: list):
+
+def create_annotated_libraries(folders: dict, filename: str, text: str, annotations: list, split: float = 0.8):
     """
 
     :param folders: dict con percorsi delle cartelle tax_test, tax_ann, xtr_test, xtr_ann, tax, xtr + timenow
     :param filename: nome file senza estensione
     :param text: testo annotato
     :param annotations: lista di annotazioni associate al testo
+    :param split: split tra librerie di train e test
     :return:
     """
 
@@ -36,10 +39,11 @@ def create_annotated_file(folders: dict, filename: str, text: str, annotations: 
             tax_count += 1
     ann.close()
 
-    create_zip(
+    _create_zip(
         tax_folder=folders["tax_folder"],
         xtr_folder=folders["xtr_folder"],
-        timestamp=folders["timenow"]
+        timestamp=folders["timenow"],
+        split=split
     )
 
 
@@ -76,7 +80,7 @@ def create_folder_structure(root_path: str) -> dict:
     }
 
 
-def create_zip(tax_folder: str, xtr_folder: str, timestamp: str, split: float = 0.8):
+def _create_zip(tax_folder: str, xtr_folder: str, timestamp: str, split: float = 0.8):
     for i in [tax_folder, xtr_folder]:
         os.chdir(i)
         # create train lib
@@ -234,4 +238,3 @@ def normalize_fucked_encoding(string: str, qmark_char: str = " ") -> str:
     for key, value in char_to_replace.items():
         string = string.replace(key, value)
     return string
-
