@@ -15,14 +15,13 @@ class CategorizationJob(AnnotationJob):
             self.taxonomy = []
 
 
-def create_annotated_libraries(folders: dict, filename: str, text: str, annotations: list, split: float = 0.8):
+def create_annotated_file(folders: dict, filename: str, text: str, annotations: list):
     """
 
-    :param folders: dict con percorsi delle cartelle tax_test, tax_ann, xtr_test, xtr_ann, tax, xtr + timenow
+    :param folders: dict con percorsi delle cartelle tax_test, tax_ann, xtr_test, xtr_ann, tax, xtr + timenow. Creato con create_folder_structure
     :param filename: nome file senza estensione
     :param text: testo annotato
     :param annotations: lista di annotazioni associate al testo
-    :param split: split tra librerie di train e test
     :return:
     """
 
@@ -39,17 +38,11 @@ def create_annotated_libraries(folders: dict, filename: str, text: str, annotati
             tax_count += 1
     ann.close()
 
-    _create_zip(
-        tax_folder=folders["tax_folder"],
-        xtr_folder=folders["xtr_folder"],
-        timestamp=folders["timenow"],
-        split=split
-    )
 
-
-def create_folder_structure(root_path: str) -> dict:
+def create_folder_structure(root_path: str, timestamp: str) -> dict:
     """
 
+    :param timestamp: momento creazione run - datetime.now().strftime('%d_%m_%y_%H_%M')
     :param root_path: Dev'essere raw string. Percorso completo dove verrà creata o si trova già la cartella runs contenente le varie run
     :return: dizionario con percorsi delle cartelle tax_test, tax_ann, xtr_test, xtr_ann, tax, xtr + timenow
     """
@@ -80,8 +73,15 @@ def create_folder_structure(root_path: str) -> dict:
     }
 
 
-def _create_zip(tax_folder: str, xtr_folder: str, timestamp: str, split: float = 0.8):
-    for i in [tax_folder, xtr_folder]:
+def create_libraries_zip(folders: dict, timestamp:str, split: float = 0.8):
+    """
+
+    :param timestamp: momento creazione run - datetime.now().strftime('%d_%m_%y_%H_%M')
+    :param folders: dict con percorsi delle cartelle tax_test, tax_ann, xtr_test, xtr_ann, tax, xtr + timenow. Creato con create_folder_structure
+    :param split: split tra librerie di train e test
+    :return:
+    """
+    for i in [folders["tax_folder"], folders["xtr_folder"]]:
         os.chdir(i)
         # create train lib
         with zipfile.ZipFile(f'{i.split("/")[-1]}_train_lib{timestamp}.zip', 'w') as zipObj:
