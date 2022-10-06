@@ -4790,7 +4790,7 @@
             "serv_prov": "Bookingcom.xml",
             "grade": "ltd3",
             "clause": "However and to the extent permitted by law, neither we nor any of our officers, directors, employees, representatives, subsidiaries, affiliated companies, distributors, affiliate (distribution) partners, licensees, agents or others involved in creating, sponsoring, promoting, or otherwise making available the site and its contents shall be liable for (i) any punitive, special, indirect or consequential loss or damages, any loss of production, loss of profit, loss of revenue, loss of contract, loss of or damage to goodwill or reputation, loss of claim, (ii) any inaccuracy relating to the (descriptive) information (including rates, availability and ratings) of the Supplier as made available on our Platform, (iii) the services rendered or the products offered by the Supplier or other business partners, (iv) any (direct, indirect, consequential or punitive) damages, losses or costs suffered, incurred or paid by you, pursuant to, arising out of or in connection with the use, inability to use or delay of our Platform, or (v) any (personal) injury, death, property damage, or other (direct, indirect, special, consequential or punitive) damages, losses or costs suffered, incurred or paid by you, whether due to (legal) acts, errors, breaches, (gross) negligence, willful misconduct, omissions, non-performance, misrepresentations, tort or strict liability by or (wholly or partly) attributable to the Supplier or any of our other business partners (including any of their employees, directors, officers, agents, representatives or affiliated companies) whose products or service are (directly or indirectly) made available, offered or promoted on or through the Platform, including any (partial) cancellation, overbooking, strike, force majeure or any other event beyond our control.",
-            "explanation": "extent, anydamage, anyloss, thirdprty, reputation, injury, security, grossnegligence, contractfailure, liabtheories, ecoloss, content, discontinuance"
+            "explanation": "extent, anydamage, anyloss, thirdparty, reputation, injury, security, grossnegligence, contractfailure, liabtheories, ecoloss, content, discontinuance"
         },
         {
             "serv_prov": "Box.xml",
@@ -7491,7 +7491,7 @@
             "serv_prov": "WeChat.xml",
             "grade": "ltd2",
             "clause": "SUBJECT TO MANDATORY APPLICABLE LAWS AND REGULATIONS, WE AND OUR AFFILIATE COMPANIES HAVE NO LIABILITY TO YOU IN RELATION TO ANY THIRD PARTIES (INCLUDING ANY CONTENT, SERVICES OR SOFTWARE PROVIDED BY SUCH THIRD PARTIES WITHIN WECHAT), NOTWITHSTANDING YOUR ENGAGEMENT WITH ANY SUCH THIRD PARTIES THROUGH WECHAT.",
-            "explanation": "thirdprty"
+            "explanation": "thirdparty"
         },
         {
             "serv_prov": "WeChat.xml",

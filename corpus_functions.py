@@ -119,8 +119,8 @@ def normalize_fucked_encoding(string: str, qmark_char: str = " ") -> str:
         "â€°": "‰",
         "â„¢": "™",
         "â€¹": "‹",
-        "â€˜": "‘",
-        "â€™": "’",
+        "â€˜": "'",
+        "â€™": "'",
         "â€œ": "“",
         "â€¢": "•",
         "â€“": "–",
@@ -228,12 +228,15 @@ def normalize_fucked_encoding(string: str, qmark_char: str = " ") -> str:
         "Ã²": "ò",
         "Ã³": "ó",
         "Ã´": "ô",
-        "â€": "”",
+        "â€": "'",
         "Ã": "à",
         "Ã": "Ý",
         "Ã": "Á",
         "Å": "Š",
-        "Â": " "
+        "Â": " ",
+        "ś": "",
+        "ť": "",
+        "\"": "'"
     }
     for key, value in char_to_replace.items():
         string = string.replace(key, value)
