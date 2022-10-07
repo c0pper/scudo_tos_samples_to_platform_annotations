@@ -1,7 +1,7 @@
 import json
-from corpus_functions import create_libraries_zip, create_folder_structure, normalize_fucked_encoding, create_annotated_file
 from tqdm import tqdm
 from datetime import datetime
+from platform_utils.functions import create_libraries_zip, create_folder_structure, normalize_fucked_encoding, create_annotated_file
 
 class Clause():
     def __init__(self, serv_prov: str, grade: str, text: str, tags=None):

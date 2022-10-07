@@ -1,6 +1,6 @@
 import json
+from platform_utils.functions import normalize_fucked_encoding
 
-import corpus_functions
 
 categories = ["A", "J", "LAW", "PINC", "USE", "LTD", "CH", "CR", "TER"]
 
@@ -9,7 +9,7 @@ ds = json.load(open("balanced_dataset_fcasciola.json", encoding="UTF8"))
 for c in categories:
     for i in ds[c]:
         print(i["clause"])
-        i["clause"] = corpus_functions.normalize_fucked_encoding(i["clause"])
+        i["clause"] = normalize_fucked_encoding(i["clause"])
         print(i["clause"])
         if "tag" in i.keys():
             i["tag"] = i["tag"].replace("_", "")
