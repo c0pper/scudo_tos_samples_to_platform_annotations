@@ -38,15 +38,34 @@ class Clause():
 
 if __name__ == "__main__":
     time = datetime.now().strftime('%d_%m_%y_%H_%M')
-    ds = json.load(open("balanced_dataset_fcasciola_encfix.json", encoding="UTF8"))
+    ds = json.load(open("b2c_ita_nomixedclauses.json", encoding="UTF8"))
     categories = ["A", "J", "LAW", "PINC", "USE", "LTD", "CH", "CR", "TER"]
     root_path = r"C:\Users\smarotta\Desktop\scudo_ann"
     folders = create_folder_structure(root_path, timestamp=time)
 
     tax = []
-    for cat in categories:
-        for idx, clause in enumerate(tqdm(ds[cat])):
-            clause_obj = Clause(clause["serv_prov"], clause["grade"], normalize_fucked_encoding(clause["clause"]), tags=[])
+    try:  # is the json divided in categories?
+        print("iterating on categories")
+        for cat in categories:
+            for idx, clause in enumerate(tqdm(ds[cat])):
+                clause_obj = Clause(clause["serv_prov"], clause["grade"], normalize_fucked_encoding(clause["clause"]), tags=[])
+                clause_obj.collect_tags(clause=clause, number_of_tags=5, tag_key="tag")
+
+                create_annotated_file(
+                    folders=folders,
+                    filename=f"{clause_obj.grade}_{idx+2}",
+                    text=clause_obj.text,
+                    annotations=clause_obj.tags
+                )
+
+                # for t in clause_obj.tags:
+                #     tax.append(t)
+        create_libraries_zip(folders=folders, timestamp=time)
+    except KeyError:
+        print("iterating on Sheet1")
+        for idx, clause in enumerate(tqdm(ds["Sheet1"])):
+            clause_obj = Clause(clause["serv_prov"], clause["grade"], normalize_fucked_encoding(clause["clause"]),
+                                tags=[])
             clause_obj.collect_tags(clause=clause, number_of_tags=5, tag_key="tag")
 
             create_annotated_file(
@@ -55,7 +74,5 @@ if __name__ == "__main__":
                 text=clause_obj.text,
                 annotations=clause_obj.tags
             )
+        create_libraries_zip(folders=folders, timestamp=time)
 
-            # for t in clause_obj.tags:
-            #     tax.append(t)
-    create_libraries_zip(folders=folders, timestamp=time)
