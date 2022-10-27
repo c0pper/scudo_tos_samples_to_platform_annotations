@@ -38,7 +38,7 @@ class Clause():
 
 if __name__ == "__main__":
     time = datetime.now().strftime('%d_%m_%y_%H_%M')
-    ds = json.load(open("b2c_ita_nomixedclauses.json", encoding="UTF8"))
+    ds = json.load(open("files/b2c_ita_nomixedclauses.json", encoding="UTF8"))
     categories = ["A", "J", "LAW", "PINC", "USE", "LTD", "CH", "CR", "TER"]
     root_path = r"C:\Users\smarotta\Desktop\scudo_ann"
     folders = create_folder_structure(root_path, timestamp=time)

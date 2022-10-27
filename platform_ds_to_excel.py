@@ -31,6 +31,8 @@ for a in ann_files:
 print(new_ds)
 final = json.dumps(new_ds, indent=4)
 
-df = pd.DataFrame.from_records(new_ds)
-df.to_excel("new_ds.xlsx", index=False)
-print(df)
+
+if __name__ == "__main__":
+    df = pd.DataFrame.from_records(new_ds)
+    df.to_excel("files/new_ds.xlsx", index=False)
+    print(df)

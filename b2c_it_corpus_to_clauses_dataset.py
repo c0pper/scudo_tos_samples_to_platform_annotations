@@ -2,7 +2,8 @@ from pathlib import Path
 import re
 import pandas as pd
 
-corpus_folder = Path("C:/Users/smarotta/OneDrive - Expert.ai S.p.A/SCUDO/B2C/materiali EUI/Corpus italiano/corpus_2022_it/original_xml/it")
+corpus_folder = Path(
+    "C:/Users/smarotta/OneDrive - Expert.ai S.p.A/SCUDO/B2C/materiali EUI/Corpus italiano/corpus_2022_it/original_xml/it")
 xml_files = list(corpus_folder.glob('**/*.xml'))
 
 ds = []
@@ -29,7 +30,8 @@ for f in xml_files:
                         # print(item)
                 elif len(c[0]) > len(c[1]):  # more tags 1 clause
                     try:
-                        item = {"filename": f.stem, "grade": ", ".join(c[0]).replace("<", "").replace(">", ""), "clause": c[1][0]}
+                        item = {"filename": f.stem, "grade": ", ".join(c[0]).replace("<", "").replace(">", ""),
+                                "clause": c[1][0]}
                         # print(item)
                         ds.append(item)
                     except IndexError:
@@ -38,5 +40,7 @@ for f in xml_files:
     print("\n")
 # print(ds)
 
-df = pd.DataFrame.from_records(ds)
-df.to_excel("b2c_ita.xlsx", index=False)
+
+if __name__ == "__main__":
+    df = pd.DataFrame.from_records(ds)
+    df.to_excel("files/b2c_ita.xlsx", index=False)
