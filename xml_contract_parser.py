@@ -99,12 +99,19 @@ def get_clauses_from_contract(xmlfile: Path, tags_to_keep: list) -> list:
 
     clauses_dicts_list = []
     for e in list(root):
-        clause_dict = {}
-        clause_dict["filename"] = xmlfile.name
-        clause_dict["clause_type"] = e.tag
-        clause_dict["text"] = e.text
+        if not e.text:  # se il testo è all interno di un altro tag innestato nel principale
+            if e[0].text:
+                text = e[0].text
+        else:
+            text = e.text
+        clause_dict = {"filename": xmlfile.name, "clause_type": e.tag, "text": text}
         for k, v in e.attrib.items():
             clause_dict[k.lower()] = v
+        if len(list(e)):
+            for sub_e in list(e):
+                clause_dict2 = {"filename": xmlfile.name, "clause_type": sub_e.tag, "text": text}
+                for k, v in sub_e.attrib.items():
+                    clause_dict2[k.lower()] = v
         if e.tag in tags_to_keep:
             # print(e.tag, e.text, e.attrib)
             clauses_dicts_list.append(clause_dict)
@@ -135,3 +142,16 @@ if __name__ == "__main__":
         xml_folder=Path("C:/Users/smarotta/OneDrive - Expert.ai S.p.A/SCUDO/B2B/Termination_24_10_2022"),
         tags_to_keep=["ter"]
     )
+    # tree = ET.parse("C:/Users/smarotta/OneDrive - Expert.ai S.p.A/SCUDO/B2B/Termination_24_10_2022/complete-cargo-wording_acom6655_3_AJ_26102022.xml")
+    # root = tree.getroot()
+    # for e in list(root):
+    #     if not e.text:
+    #         if e[0].text:
+    #             text = e[0].text
+    #     else:
+    #         text = e.text
+    #     print(e.tag, e.attrib["ID"], text)
+    #     if len(list(e)):
+    #         for sub_e in list(e):
+    #             print(sub_e.tag, sub_e.attrib["ID"], sub_e.text)
+
