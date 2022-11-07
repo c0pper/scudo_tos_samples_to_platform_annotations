@@ -120,37 +120,73 @@ def get_clauses_from_contract(xmlfile: Path, tags_to_keep: list) -> list:
             # print(e.tag, e.text, e.attrib)
             clauses_dicts_list.append(clause_dict)
             # print({"tag": e.tag, "text": e.text, "tags": e.attrib})
-    print(f"found clauses:\n{clauses_dicts_list}")
+    # print(f"found clauses:\n{clauses_dicts_list}")
+
+
+    clauses_dicts_list = join_references(clauses_dicts_list)
     return clauses_dicts_list
 
 
-def join_references(clauses_dicts_list: list):
-    # for c in clauses_dicts_list:
-    #     if "id" in c.keys():
-    #         if "ref" not in c.keys():  # if father is not a child itself
-    #             for c2 in clauses_dicts_list:  # check if every clause has reference (is child)
-    #                 if "ref" in c2.keys():
-    #                     if c["id"] == c2["ref"]:  # check if found reference matches the father id
-    #                         print(f"father: {c['id']} {c['text']} | child: {c2['id']} {c2['text']}")
+def remove_qmark_from_level(txt):
+    txt = txt.replace("?", "")
+    try:
+        int(txt)
+        return txt
+    except (ValueError, TypeError) as v:
+        txt = "0"
+        return txt
 
-    children = []
-    for c in clauses_dicts_list:
-        if "id" in c.keys():
-            if "ref" in c.keys():  # is a child
-                # print({"id": c["id"], "text": c["text"], "ref": c["ref"]})
-                children.append({"id": c["id"], "text": c["text"], "ref": c["ref"]})
-    for ch in children:  # last piece
-        for cl in clauses_dicts_list:  # middle piece
-            if "id" in cl.keys():
-                if ch["ref"] == cl["id"]:
-                    if "ref" in cl.keys():  # se la clausola che consideriamo padre ha anch'essa un padre
-                        for father_clause in clauses_dicts_list:  # first piece
-                            if "id" in father_clause.keys():
-                                if cl["ref"] == father_clause["id"]:
-                                    print("3 layers", father_clause["id"], father_clause["text"], cl["id"], cl["text"], ch["id"], ch["text"])
-                    else:
-                        print("2 layers", cl["id"], cl["text"], ch["id"], ch["text"])
 
+def join_references(clauses_dicts_list):
+    complete_clauses = []
+    parent_id = None
+    for p in clauses_dicts_list:
+        complete_text = ""
+        clause_type = p.get("clause_type")
+        filename = p.get("filename")
+        # print(p.get("id"), p.get("ref"), p.get("text"))
+        if "ref" not in p:
+            all_refs = [ch1.get("ref") for ch1 in clauses_dicts_list]
+            parent_id = p.get("id")
+            parent = p["text"]
+            print(parent)
+            parent_level = remove_qmark_from_level(p.get("l", "0"))
+            complete_text = parent
+            if parent_id not in all_refs:
+                # print(parent)
+                complete_clauses.append((filename, parent_id, complete_text, clause_type + str(parent_level)))
+        for ch1 in clauses_dicts_list:
+            ch1_id = ch1.get("id")
+            ch1_level = remove_qmark_from_level(ch1.get("l", "0"))
+            if ch1.get("ref"):
+                if ch1.get("ref") == parent_id:
+                    all_refs = [ch2.get("ref") for ch2 in clauses_dicts_list]
+                    if ch1_id not in all_refs:
+                        complete_text = parent + " " + ch1["text"]
+                        # print(parent_ch1)
+                        complete_clauses.append(
+                            (filename, parent_id, complete_text, clause_type + str(max([int(ch1_level), int(parent_level)]))))
+                    for ch2 in clauses_dicts_list:
+                        ch2_level = remove_qmark_from_level(ch2.get("l", "0"))
+                        if ch2.get("ref") == ch1_id:
+                            complete_text = parent + " " + ch1["text"] + " " + ch2["text"]
+                            # print(parent_ch1_ch2)
+                            complete_clauses.append(
+                                (filename, parent_id, complete_text,
+                                 clause_type + str(max([int(ch2_level), int(ch1_level), int(parent_level)]))))
+
+    final_list_of_dicts = []
+    for i in sorted(set(complete_clauses), key=complete_clauses.index):
+        dict_from_tuple = {
+            "filename": i[0],
+            "main_id": i[1],
+            "text": i[2],
+            "level": i[3],
+        }
+        final_list_of_dicts.append(dict_from_tuple)
+        print(dict_from_tuple)
+
+    return final_list_of_dicts
 
 
 def main(xml_folder: Path, tags_to_keep: list):
@@ -162,7 +198,9 @@ def main(xml_folder: Path, tags_to_keep: list):
         # print(f.name)
         clean_file(f, tags_to_keep)
         list_of_clauses_in_f = get_clauses_from_contract(f, tags_to_keep)
-        join_references(list_of_clauses_in_f)
+        for i in list_of_clauses_in_f:
+            print(i)
+
         if list_of_clauses_in_f:
             for c in list_of_clauses_in_f:
                 df_list.append(c)
@@ -171,7 +209,7 @@ def main(xml_folder: Path, tags_to_keep: list):
     # print([i for i in df_list])
     df = pd.DataFrame.from_records(df_list)
     # print(df)
-    # df.to_excel(f"files/{xml_folder.name}.xlsx", index=False)
+    df.to_excel(f"files/{xml_folder.name}_parsed.xlsx", index=False)
 
 
 if __name__ == "__main__":
