@@ -3,7 +3,7 @@ from pathlib import Path
 import regex
 import os
 import pandas as pd
-
+import json
 
 def insert(originalfile, string):
     """
@@ -33,9 +33,9 @@ def remove_extra_tags(tags_to_keep: list, text: str):
     if not any(x in tags_to_keep for x in tags):
         raise Exception("tag_to_keep not in tags")
     else:
-        tags = [item for item in tags if item not in tags_to_keep]
+        tags_to_remove = [item for item in tags if item not in tags_to_keep]
         # print(tags)
-        for t in tags:
+        for t in tags_to_remove:
             pattern_open = f"<{t}.*?>"
             pattern_close = f"<\/{t}\d?>"
             text = regex.sub(pattern_open, "", text)
@@ -116,6 +116,8 @@ def get_clauses_from_contract(xmlfile: Path, tags_to_keep: list) -> list:
                 clause_dict2 = {"filename": xmlfile.name, "clause_type": sub_e.tag, "text": text}
                 for k, v in sub_e.attrib.items():
                     clause_dict2[k.lower()] = v
+                if sub_e.tag in tags_to_keep:
+                    clauses_dicts_list.append(clause_dict2)
         if e.tag in tags_to_keep:
             # print(e.tag, e.text, e.attrib)
             clauses_dicts_list.append(clause_dict)
@@ -180,8 +182,8 @@ def join_references(clauses_dicts_list):
         dict_from_tuple = {
             "filename": i[0],
             "main_id": i[1],
-            "text": i[2],
-            "level": i[3],
+            "clause": i[2],
+            "grade": i[3],
         }
         final_list_of_dicts.append(dict_from_tuple)
         print(dict_from_tuple)
@@ -208,12 +210,16 @@ def main(xml_folder: Path, tags_to_keep: list):
 
     # print([i for i in df_list])
     df = pd.DataFrame.from_records(df_list)
-    # print(df)
+
+    with open(f"files/{xml_folder.name}_parsed.json", 'w') as f:
+        json.dump(df_list, f, indent=4)
+
     df.to_excel(f"files/{xml_folder.name}_parsed.xlsx", index=False)
 
 
 if __name__ == "__main__":
     ter_contracts_folder = Path(
-        "C:/Users/smarotta/OneDrive - Expert.ai S.p.A/SCUDO/B2B/B2B eng xml/Termination_24_10_2022")
+        "C:/Users/smarotta/OneDrive - Expert.ai S.p.A/SCUDO/B2B/B2B eng xml/Termination_Law_Jurisdiction_08_11_2022/Fixed_08_11_2022")
 
-    main(xml_folder=ter_contracts_folder, tags_to_keep=["ter"])
+
+    main(xml_folder=ter_contracts_folder, tags_to_keep=["ter","law","j"])
