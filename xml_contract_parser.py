@@ -5,6 +5,8 @@ import os
 import pandas as pd
 import json
 
+# XML XPATH doc https://docs.python.org/3/library/xml.etree.elementtree.html
+
 def insert(originalfile, string):
     """
     Insert text at the beginning of file, used to prepend xml header
@@ -124,7 +126,6 @@ def get_clauses_from_contract(xmlfile: Path, tags_to_keep: list) -> list:
             # print({"tag": e.tag, "text": e.text, "tags": e.attrib})
     # print(f"found clauses:\n{clauses_dicts_list}")
 
-
     clauses_dicts_list = join_references(clauses_dicts_list)
     return clauses_dicts_list
 
@@ -167,7 +168,8 @@ def join_references(clauses_dicts_list):
                         complete_text = parent + " " + ch1["text"]
                         # print(parent_ch1)
                         complete_clauses.append(
-                            (filename, parent_id, complete_text, clause_type + str(max([int(ch1_level), int(parent_level)]))))
+                            (filename, parent_id, complete_text,
+                             clause_type + str(max([int(ch1_level), int(parent_level)]))))
                     for ch2 in clauses_dicts_list:
                         ch2_level = remove_qmark_from_level(ch2.get("l", "0"))
                         if ch2.get("ref") == ch1_id:
@@ -218,8 +220,15 @@ def main(xml_folder: Path, tags_to_keep: list):
 
 
 if __name__ == "__main__":
-    ter_contracts_folder = Path(
-        "C:/Users/smarotta/OneDrive - Expert.ai S.p.A/SCUDO/B2B/B2B eng xml/Termination_Law_Jurisdiction_08_11_2022/Fixed_08_11_2022")
+    contracts_folder = Path(
+         "C:/Users/smarotta/OneDrive - Expert.ai S.p.A/SCUDO/B2B/B2B eng xml/All_Categories")
 
 
-    main(xml_folder=ter_contracts_folder, tags_to_keep=["ter","law","j"])
+    main(xml_folder=contracts_folder, tags_to_keep=["ter","law","j","ch","ltd"])
+    #
+    # tree = ET.parse(
+    #     'C:/Users/smarotta/OneDrive - Expert.ai S.p.A/SCUDO/B2B/B2B eng xml/All_Categories/AA_Fleet Breakdown Cover_AJ_22.11.2022.xml')
+    # root = tree.getroot()
+    #
+    # for ltd in root.findall(".//ltd"):
+    #     print(ltd.attrib, ltd.text, "\n")
